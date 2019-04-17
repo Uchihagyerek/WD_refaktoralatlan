@@ -17,11 +17,7 @@ public class HighScores extends Canvas {
 
         thisFrame=frame;
 
-
-
-        DataBase db=new DataBase();
-
-        List<String[]> scores=db.getScores();
+        List<String[]> scores=DataBase.getScores();
         String[] score;
 
         for (int i = 0; i < scores.size()&&i< 10; i++) {
@@ -39,10 +35,5 @@ public class HighScores extends Canvas {
             frame.add(points);
 
         }
-
-
-
-
     }
-
 }

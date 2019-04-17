@@ -10,30 +10,28 @@ import java.io.IOException;
 
 public class Battle extends Canvas {
 
-    DataBase db=new DataBase();
+
     private int cooldown;
-    static JFrame thisFrame;
-    Map map;
-    Monster enemy;
-    JProgressBar enemyHealth;
-    JProgressBar playerHealth;
-    JProgressBar playerMana;
-    JProgressBar playerExp;
-    JButton attack;
-    JButton spell;
-    JButton potion;
-    JButton escape;
-    JLabel level;
-    Player player;
+    private static JFrame thisFrame;
+    private Map map;
+    private Monster enemy;
+    private JProgressBar enemyHealth;
+    private JProgressBar playerHealth;
+    private JProgressBar playerMana;
+    private JButton attack;
+    private JButton spell;
+    private JButton potion;
+    private JButton escape;
+    private Player player;
     private boolean boss;
     public Battle(Map map, Player player, boolean boss) {
         String[] monster;
         setSize(900, 900);
         this.boss=boss;
         if (!boss)
-            monster = db.getMonster();
+            monster = DataBase.getMonster(0);
         else
-            monster=db.getBoss();
+            monster=DataBase.getMonster(1);
 
         this.map = map;
         this.player = player;
@@ -73,7 +71,7 @@ public class Battle extends Canvas {
         attack.setBackground(Color.WHITE);
         attack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                attackBtn(player.damage);
+                attackBtn();
             }
         });
 
@@ -129,7 +127,7 @@ public class Battle extends Canvas {
         playerMana.setStringPainted (true);
         playerMana.setForeground (Color.BLUE);
 
-        playerExp=new JProgressBar();
+        JProgressBar playerExp = new JProgressBar();
         playerExp.setMaximum(player.remainingExp);
         playerExp.setValue(player.exp);
         playerExp.setBounds(0,880,900,20);
@@ -137,7 +135,7 @@ public class Battle extends Canvas {
         playerExp.setStringPainted(true);
         playerExp.setForeground(Color.magenta);
 
-        level=new JLabel();
+        JLabel level = new JLabel();
         level.setText("Lvl: "+player.level);
         level.setBounds(430,870,50,10);
         level.setBackground(Color.lightGray);
@@ -156,8 +154,8 @@ public class Battle extends Canvas {
     }
 
 
-    private void attackBtn(int damage) {
-        attack(damage);
+    private void attackBtn() {
+        attack();
         manageButtons();
         Thread myThread=new Thread() {
             public void run() {
@@ -172,32 +170,44 @@ public class Battle extends Canvas {
         };
         myThread.start();
     }
-    private void attack(int damage){
+    private void attack(){
         System.out.println("ATTACK!!");
-        enemyHealth.setValue(enemyHealth.getValue()-damage);
-        enemyHealth.setString(enemy.name+": "+enemyHealth.getValue()+"/"+enemyHealth.getMaximum());
 
-        if (enemyHealth.getValue()<=0){
+        enemy.health-=player.attack();
+
+
+        checkKill();
+
+
+
+    }
+
+    private void checkKill(){
+        if (isDead(enemy)){
             enemy.die();
             map.defeated=true;
             if(boss)
                 player.points+=500;
             else
-            player.points+=50;
+                player.points+=50;
 
             endBattle ();
 
         }
+    }
 
+    private boolean isDead(Entity target){
 
+        return target.health<=0;
 
     }
+
     private void enemyAttack(){
 
         player.health-=enemy.attack();
         setStats ();
 
-        if(playerHealth.getValue()<=0){
+        if(isDead(player)){
 
             player.die();
             player=new Player(player.name,map);
@@ -211,18 +221,22 @@ public class Battle extends Canvas {
         playerHealth.setString("Health: "+player.health+"/"+player.maxHealth);
         playerMana.setValue (player.mana);
         playerMana.setString("Mana: "+player.mana+"/"+player.maxMana);
+        enemyHealth.setValue(enemy.health);
+        enemyHealth.setString(enemy.name+": "+enemy.health+"/"+enemy.maxHealth);
     }
 
     private void spell() {
         if(player.mana>20) {
             System.out.println ("You used fireball");
-            attackBtn ((int) (player.damage * 0.5));
+            enemy.health-=(int) (player.attack() * 1.8);
             cooldown = 3;
             player.mana-=20;
             setStats ();
+            checkKill();
         }else{
             System.out.println ("Not enough mana!");
         }
+
     }
     private void potion() {
         if (player.potionsCount>0){

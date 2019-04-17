@@ -3,8 +3,8 @@ package dip;
 import java.util.Random;
 
 public class Monster extends Entity {
-    int damage;
-    Player player;
+    private int damage;
+    private Player player;
     public Monster(String name, int health, int mana, int damage, Player player){
     this.name=name;
     this.health=health;

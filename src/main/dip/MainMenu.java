@@ -7,11 +7,8 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 public class MainMenu extends Canvas {
-    static JFrame thisFrame;
-    JButton start;
-    JButton highScores;
-    JButton exit;
-    String name;
+    private static JFrame thisFrame;
+
     public MainMenu(){
         setSize(900,900);
     }
@@ -35,7 +32,7 @@ public class MainMenu extends Canvas {
         thisFrame=frame;
 
 
-        start =new JButton("Play");
+        JButton start = new JButton("Play");
         start.setBounds(250,450,400,150);
         start.setBackground(Color.WHITE);
         start.addActionListener(new ActionListener() {
@@ -44,7 +41,7 @@ public class MainMenu extends Canvas {
             }
         });
 
-        highScores=new JButton("Hi-Scores");
+        JButton highScores = new JButton("Hi-Scores");
         highScores.setBounds(250,600,400,150);
         highScores.setBackground(Color.WHITE);
         highScores.addActionListener(new ActionListener() {
@@ -54,7 +51,7 @@ public class MainMenu extends Canvas {
         });
 
 
-        exit =new JButton("Exit");
+        JButton exit = new JButton("Exit");
         exit.setBounds(250,750,400, 150);
         exit.setBackground(Color.WHITE);
         exit.addActionListener(new ActionListener() {
@@ -86,7 +83,7 @@ public class MainMenu extends Canvas {
 
     private void startGame(){
 
-        name = JOptionPane.showInputDialog("Enter your name");
+        String name = JOptionPane.showInputDialog("Enter your name");
         Map map=new Map(name);
         map.start();
 

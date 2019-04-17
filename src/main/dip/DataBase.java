@@ -6,13 +6,11 @@ import java.util.List;
 import java.util.Random;
 
 public class DataBase {
-    Connection conn;
+    private static Connection conn;
 
-    public DataBase() {
-        conn = null;
-    }
 
-    private void open(){
+
+    private static void open(){
         try {
             String url = "jdbc:sqlite:src/db/maindb.db";
             conn = DriverManager.getConnection(url);
@@ -24,7 +22,7 @@ public class DataBase {
         }
     }
 
-    private void close() {
+    private static void close() {
         try {
             if (conn != null) {
                 conn.close();
@@ -35,7 +33,7 @@ public class DataBase {
         }
     }
 
-    public String[] getMonster() {
+    public static String[] getMonster(int boss) {
         open();
         String[] monster;
         List<String[]> monsters = new ArrayList<String[]>();
@@ -43,7 +41,8 @@ public class DataBase {
 
         try {
             Statement stm = conn.createStatement();
-            ResultSet rs = stm.executeQuery("SELECT * FROM monsters WHERE boss=0");
+
+            ResultSet rs = stm.executeQuery("SELECT * FROM monsters WHERE boss="+boss);
 
             while (rs.next()) {
                 monster = new String[5];
@@ -66,38 +65,8 @@ public class DataBase {
         return monster;
     }
 
-    public String[] getBoss() {
-        open();
-        String[] monster;
-        List<String[]> monsters = new ArrayList<>();
-        Random rand = new Random();
 
-
-        try {
-            Statement stm = conn.createStatement();
-            ResultSet rs = stm.executeQuery("SELECT * FROM monsters WHERE boss=1");
-
-            while (rs.next()) {
-                monster = new String[5];
-                monster[0] = rs.getString("id");
-                monster[1] = rs.getString("name");
-                monster[2] = rs.getString("health");
-                monster[3] = rs.getString("mana");
-                monster[4] = rs.getString("damage");
-
-                monsters.add(monster);
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-
-        monster = monsters.get(rand.nextInt(monsters.size()));
-        close();
-
-        return monster;
-    }
-
-    public void setScore(int score, String playerName) {
+    public static void setScore(int score, String playerName) {
         open();
 
         String sql = "INSERT INTO scores(score,player_id) VALUES("+score+",(SELECT id FROM player WHERE name=\""+playerName+"\"))";
@@ -113,7 +82,7 @@ public class DataBase {
         close();
     }
 
-    public String[] getPlayers(){
+    public static String[] getPlayers(){
         open();
         String[] players=new String[50];
         int i=0;
@@ -134,7 +103,7 @@ public class DataBase {
         return players;
     }
 
-    public void newPlayer(String name){
+    public static void newPlayer(String name){
         open();
 
         String sql = "INSERT INTO player(name) VALUES(\""+name+"\")";
@@ -149,7 +118,7 @@ public class DataBase {
 
     }
 
-    public List<String[]> getScores(){
+    public static List<String[]> getScores(){
         open();
 
         String sql="SELECT name, score FROM player INNER JOIN scores ON player.id = scores.player_id ORDER BY score DESC";

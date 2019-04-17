@@ -1,10 +1,11 @@
 package dip;
 
 import javax.swing.*;
+import java.util.Random;
 
 public class Player extends Entity{
     public int exp;
-    public int points=5000;   //drawtext
+    public int points;   //drawtext
     public int remainingExp;
     public int potionsCount;
     public int damage;
@@ -21,6 +22,7 @@ public class Player extends Entity{
         remainingExp=1000;
         this.map=map;
         potionsCount=3;
+        points = 5000;
     }
 
     public void levelUp(){
@@ -49,15 +51,16 @@ public class Player extends Entity{
     }
 
     int attack() {
-        int damage=0;
-
-
-        return damage;
+        Random rand=new Random();
+        int minDmg= (int) Math.floor(damage-damage*0.3);
+        int maxDmg=(int) Math.ceil(damage+damage*0.3);
+        int dmgDealt=rand.nextInt(maxDmg-minDmg)+minDmg;
+        System.out.println(dmgDealt);
+        return dmgDealt;
     }
     void die(){
         points-=3000;
-        DataBase db =new DataBase();
-        db.setScore(points, name);
+        DataBase.setScore(points, name);
         int restart= JOptionPane.YES_NO_OPTION;
         restart=JOptionPane.showConfirmDialog(null,"Would you like to restart?","You died!",restart);
         if(restart==JOptionPane.YES_OPTION){
