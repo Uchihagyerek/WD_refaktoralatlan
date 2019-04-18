@@ -12,7 +12,7 @@ public class Player extends Entity{
     Map map;
     public Player(String name, Map map){
         this.name=name;
-        damage=20;
+        damage=2000;
         level=1;
         maxHealth=500;
         maxMana=500;

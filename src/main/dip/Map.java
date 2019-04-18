@@ -22,10 +22,10 @@ public class Map extends Canvas {
     private int y;
     private int startX;
     private int startY;
-    private int myX;
-    private int myY;
-    public boolean started = false;
-    private int[][] map;
+    public static int myX;
+    public static int myY;
+    public static boolean started = false;
+    public static int[][] map;
     private int mapsize = 15;
     private int monsters = 0;
     private boolean boss;
@@ -33,7 +33,7 @@ public class Map extends Canvas {
     private static Player player;
     private int levelCount = 0;
     private Random random = new Random ();
-    boolean defeated = false;
+    static boolean defeated = false;
     private Point[] deltas;
 
     Map (String name) {
@@ -97,6 +97,7 @@ public class Map extends Canvas {
                     break;
 
 
+
             }
         } catch (ArrayIndexOutOfBoundsException ex) {
 
@@ -156,7 +157,7 @@ public class Map extends Canvas {
         }
 
         rollRoom (x, y);
-        map[x][y] = 4;   //boss
+        map[x][y] = 1;   //boss room as last one
         for (int i = 0; i < mapsize; i++) {
             for (int j = 0; j < mapsize; j++) {
                 System.out.print (map[j][i]);
@@ -169,6 +170,7 @@ public class Map extends Canvas {
 
     @Override
     public void update (Graphics g) {
+        checkCurrentRoom ();
         paint (g);
     }
 
@@ -204,37 +206,14 @@ public class Map extends Canvas {
                         g.fillRect ((sor * roomSize) + (roomSize / 3), ((oszlop + 1) * roomSize) - 10, roomSize / 3, 10);//bottom door
                     }
                 }
-
             }
-
         }
         boss = bossCheck ();
         if (boss) {
 
             g.setColor (Color.RED);
             g.fillRect ((y * roomSize) + 7, ((x) * roomSize) + 7, roomSize2, roomSize2);
-
-            if (map[myY][myX] == 4) {
-                if (! defeated) {
-                    System.out.println ("Boss battle starts");
-                    startBattle ();
-                } else {
-                    map[myY][myX] = 1;
-                    defeated = false;
-                    if (levelCount < 8)
-                        generateMap ();
-                    else {
-                        JOptionPane.showMessageDialog (frame, "You Win!");
-
-                        DataBase.setScore (player.points, player.name);
-                        frame.dispose ();
-                        MainMenu menu = new MainMenu ();
-                        menu.open (menu);
-                    }
-                }
-            }
         }
-
         g.setColor (Color.CYAN);
         g.fillRect ((startY * roomSize) + 7, ((startX) * roomSize) + 7, roomSize2, roomSize2);
         g.setColor (Color.GREEN);
@@ -242,30 +221,69 @@ public class Map extends Canvas {
         if (map[myY][myX] == 3) {
             g.setColor (Color.YELLOW);
             g.fillRect (750, 500, 100, 50);
-            map[myY][myX] = 1;
-            System.out.println ("You found treasure!");
-            treasureRoom ();
-        } else if (map[myY][myX] == 2) {
-
-            if (! defeated && ! started) {
-
-
-                System.out.println ("You encountered a monster!");
-                startBattle ();
-                started = true;
-
-
-            } else if (defeated) {
-                map[myY][myX] = 1;
-                monsters--;
-                defeated = false;
-
-
-            }
         }
 
         ig.drawImage (image, 0, 0, this);
+    }
 
+    private void checkCurrentRoom(){
+        switch(map[myY][myX]){
+            case 2:
+                setBattleStatus ();
+                break;
+            case 3:
+                map[myY][myX] = 1;
+                System.out.println ("You found treasure!");
+                treasureRoom ();
+                break;
+            case 4:
+                setBossStatus ();
+                break;
+            default:
+                break;
+
+        }
+    }
+
+    private void setBossStatus(){
+        if (! defeated) {
+            System.out.println ("Boss battle starts");
+            startBattle ();
+        } else {
+            map[myY][myX] = 1;
+            defeated = false;
+            if (levelCount < 8)
+                generateMap ();
+            else {
+                JOptionPane.showMessageDialog (frame, "You Win!");
+
+                DataBase.setScore (player.points, player.name);
+                frame.dispose ();
+                MainMenu menu = new MainMenu ();
+                menu.open (menu);
+            }
+        }
+    }
+
+
+
+
+    private void setBattleStatus (){
+        if (! defeated && ! started) {
+
+
+            System.out.println ("You encountered a monster!");
+            startBattle ();
+            started = true;
+
+
+        } else if (defeated) {
+            map[myY][myX] = 1;
+            monsters--;
+            defeated = false;
+
+
+        }
     }
 
 
@@ -335,7 +353,12 @@ public class Map extends Canvas {
     }
 
     private boolean bossCheck () {
-        return monsters <= 0;
+
+        boolean boss=monsters <= 0;
+        if(boss){
+            map[x][y]=4;
+        }
+        return boss;
     }
 
     public void start () {
