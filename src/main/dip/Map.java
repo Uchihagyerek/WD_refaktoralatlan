@@ -13,6 +13,7 @@ import java.util.Random;
 import java.util.Vector;
 
 
+
 public class Map extends Canvas {
     private JFrame frame = null;
     private int roomCount;
@@ -37,8 +38,9 @@ public class Map extends Canvas {
     private Point[] deltas;
 
     Map (String name) {
-        setSize (new Dimension (800, 800));
+        setSize (new Dimension (900, 900));
         tries = 0;
+
         addKeyListener (new KeyAdapter () {
             @Override
             public void keyPressed (KeyEvent evt) {
@@ -46,6 +48,12 @@ public class Map extends Canvas {
             }
 
         });
+
+
+
+        Sounds.playMusic ("bgmusic.wav");
+
+
         if (player == null)
             player = new Player (name, this);
 
@@ -95,6 +103,17 @@ public class Map extends Canvas {
                 case KeyEvent.VK_I:
                     player.getStats ();
                     break;
+                case KeyEvent.VK_C:
+                    if(!player.cheat){
+                        player.damage*=20;
+                        player.cheat=true;
+                        System.out.println ("Cheat mode activated");
+                    }else{
+                        player.damage/=20;
+                        player.cheat=false;
+                        System.out.println ("Cheat mode deactivated");
+                    }
+                        break;
 
 
 
@@ -208,6 +227,14 @@ public class Map extends Canvas {
                 }
             }
         }
+        if (map[myY][myX] == 3) {
+            g.setColor (Color.YELLOW);
+            g.fillRect (750, 500, 100, 50);
+            map[myY][myX] = 1;
+            System.out.println ("You found treasure!");
+            Sounds.playSound ("loot.wav");
+            treasureRoom ();
+        }
         boss = bossCheck ();
         if (boss) {
 
@@ -218,10 +245,7 @@ public class Map extends Canvas {
         g.fillRect ((startY * roomSize) + 7, ((startX) * roomSize) + 7, roomSize2, roomSize2);
         g.setColor (Color.GREEN);
         g.fillOval ((myX * roomSize) + 15, (myY * roomSize) + 15, 20, 20);
-        if (map[myY][myX] == 3) {
-            g.setColor (Color.YELLOW);
-            g.fillRect (750, 500, 100, 50);
-        }
+
 
         ig.drawImage (image, 0, 0, this);
     }
@@ -231,11 +255,7 @@ public class Map extends Canvas {
             case 2:
                 setBattleStatus ();
                 break;
-            case 3:
-                map[myY][myX] = 1;
-                System.out.println ("You found treasure!");
-                treasureRoom ();
-                break;
+
             case 4:
                 setBossStatus ();
                 break;
@@ -274,6 +294,8 @@ public class Map extends Canvas {
 
             System.out.println ("You encountered a monster!");
             startBattle ();
+
+
             started = true;
 
 
@@ -382,6 +404,7 @@ public class Map extends Canvas {
         Treasure treasure = new Treasure ();
         int type = treasure.getType ();
         int value = treasure.getValue ();
+
         switch (type) {
             case 1:
                 player.maxHealth += value;
@@ -400,6 +423,8 @@ public class Map extends Canvas {
 
         }
     }
+
+
 
 
 }

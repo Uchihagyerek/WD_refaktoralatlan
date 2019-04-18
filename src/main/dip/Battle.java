@@ -25,14 +25,20 @@ public class Battle extends Canvas {
     private Player player;
     private boolean boss;
     public Battle(Map map, Player player, boolean boss) {
+
+        Sounds.stopMusic ();
         String[] monster;
         setSize(900, 900);
+        String music;
         this.boss=boss;
-        if (!boss)
-            monster = DataBase.getMonster(0);
-        else
-            monster=DataBase.getMonster(1);
-
+        if (!boss) {
+            monster = DataBase.getMonster (0);
+            music="battlemusic.wav";
+        }
+        else {
+            monster = DataBase.getMonster (1);
+            music="bossmusic.wav";
+        }
         this.map = map;
         this.player = player;
 
@@ -40,6 +46,7 @@ public class Battle extends Canvas {
             System.out.println(monster[i] + ", ");
         }
         enemy = new Monster(monster[1], Integer.parseInt(monster[2]), Integer.parseInt(monster[3]), Integer.parseInt(monster[4]), player);
+        Sounds.playMusic (music);
 
 
     }
@@ -161,7 +168,10 @@ public class Battle extends Canvas {
         Thread myThread=new Thread() {
             public void run() {
                 try {
+
                     sleep(1000);
+                    if(!isDead (enemy))
+                    Sounds.playSound ("monster.wav");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -176,8 +186,10 @@ public class Battle extends Canvas {
 
         if(spell){
             enemy.health-=(int) (player.attack() * 1.8);
+            Sounds.playSound ("fireball.wav");
         }else {
             enemy.health -= player.attack ();
+            Sounds.playSound ("sword.wav");
         }
 
         checkKill();
@@ -199,6 +211,7 @@ public class Battle extends Canvas {
 
     private void checkKill(){
         if (isDead(enemy)){
+            Sounds.stopMusic ();
             enemy.die();
             map.defeated=true;
             if(boss)
@@ -221,6 +234,7 @@ public class Battle extends Canvas {
 
         player.health-=enemy.attack();
         setStats ();
+
 
         if(isDead(player)){
 
@@ -286,6 +300,7 @@ public class Battle extends Canvas {
     }
 
     private void endBattle(){
+
         map.setFocusable(true);
         map.requestFocus();
         thisFrame.dispose();
@@ -293,6 +308,7 @@ public class Battle extends Canvas {
         if(map.defeated){
             map.repaint ();
         }
+        Sounds.playMusic ("bgmusic.wav");
 
     }
 
