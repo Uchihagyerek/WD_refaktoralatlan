@@ -71,7 +71,7 @@ public class Battle extends Canvas {
         attack.setBackground(Color.WHITE);
         attack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                attackBtn();
+                attackBtn(false);
             }
         });
 
@@ -103,11 +103,11 @@ public class Battle extends Canvas {
         });
 
         enemyHealth=new JProgressBar();
-        int maxhealth=enemy.health;
-        enemyHealth.setMaximum(maxhealth);
-        enemyHealth.setValue(maxhealth);
+
+        enemyHealth.setMaximum(enemy.maxHealth);
+        enemyHealth.setValue(enemy.maxHealth);
         enemyHealth.setBounds(0,0,900,30);
-        enemyHealth.setString(enemy.name+": "+enemy.health+"/"+maxhealth);
+        enemyHealth.setString(enemy.name+": "+enemy.health+"/"+enemy.maxHealth);
         enemyHealth.setStringPainted(true);
         enemyHealth.setForeground(Color.RED);
 
@@ -154,9 +154,10 @@ public class Battle extends Canvas {
     }
 
 
-    private void attackBtn() {
-        attack();
+    private void attackBtn(boolean spell) {
+        attack(spell);
         manageButtons();
+        setStats ();
         Thread myThread=new Thread() {
             public void run() {
                 try {
@@ -170,15 +171,29 @@ public class Battle extends Canvas {
         };
         myThread.start();
     }
-    private void attack(){
+    private void attack(boolean spell){
         System.out.println("ATTACK!!");
 
-        enemy.health-=player.attack();
-
+        if(spell){
+            enemy.health-=(int) (player.attack() * 1.8);
+        }else {
+            enemy.health -= player.attack ();
+        }
 
         checkKill();
+    }
 
+    private void spell() {
+        if(player.mana>20) {
 
+            System.out.println ("You used fireball");
+            attackBtn (true);
+            cooldown = 3;
+            player.mana-=20;
+        }else{
+
+            System.out.println ("Not enough mana!");
+        }
 
     }
 
@@ -225,19 +240,7 @@ public class Battle extends Canvas {
         enemyHealth.setString(enemy.name+": "+enemy.health+"/"+enemy.maxHealth);
     }
 
-    private void spell() {
-        if(player.mana>20) {
-            System.out.println ("You used fireball");
-            enemy.health-=(int) (player.attack() * 1.8);
-            cooldown = 3;
-            player.mana-=20;
-            setStats ();
-            checkKill();
-        }else{
-            System.out.println ("Not enough mana!");
-        }
 
-    }
     private void potion() {
         if (player.potionsCount>0){
             if(player.health+100<=player.maxHealth)

@@ -11,6 +11,7 @@ public class Monster extends Entity {
     this.mana=mana;
     this.damage=damage;
     this.player=player;
+    this.maxHealth=health;
     }
 
     synchronized int attack() {
