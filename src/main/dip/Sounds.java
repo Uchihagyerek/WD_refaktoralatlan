@@ -11,7 +11,7 @@ public class Sounds {
         try {
             clip = AudioSystem.getClip();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-                    MainClass.class.getResourceAsStream("/" + url));
+                    MainClass.class.getResourceAsStream("/sounds/" + url));
             clip.open(inputStream);
             clip.loop(Clip.LOOP_CONTINUOUSLY);
 
@@ -25,7 +25,7 @@ public class Sounds {
         try {
             Clip clip = AudioSystem.getClip();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-                    MainClass.class.getResourceAsStream("/" + url));
+                    MainClass.class.getResourceAsStream("/sounds/" + url));
             clip.open(inputStream);
             clip.start();
 
